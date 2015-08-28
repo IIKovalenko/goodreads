@@ -1,15 +1,11 @@
 import webbrowser
-from session import GoodreadsSession
-from user import GoodreadsUser
-from book import GoodreadsBook
-from author import GoodreadsAuthor
-from request import GoodreadsRequest
-from comment import GoodreadsComment
-from event import GoodreadsEvent
-from group import GoodreadsGroup
-from owned_book import GoodreadsOwnedBook
-from review import GoodreadsReview
+from builtins import input
+from .session import GoodreadsSession
+from .request import GoodreadsRequest
 import collections
+
+import goodreads as gr
+
 
 class GoodreadsClientException(Exception):
     def __init__(self, error_msg):
@@ -17,6 +13,7 @@ class GoodreadsClientException(Exception):
 
     def __str__(self):
         return self.error_msg
+
 
 class GoodreadsClient():
     base_url = "http://www.goodreads.com/"
@@ -39,7 +36,7 @@ class GoodreadsClient():
         else:
             url = self.session.oauth_init()
             webbrowser.open(url)
-            while raw_input("Have you authorized me? (y/n)") != 'y':
+            while input("Have you authorized me? (y/n)") != 'y':
                 pass
             self.session.oauth_finalize()
 
@@ -69,12 +66,12 @@ class GoodreadsClient():
         if not (user_id or username):
             return self.auth_user()
         resp = self.request("user/show", {'id': user_id, 'username': username})
-        return GoodreadsUser(resp['user'], self)
+        return gr.User(resp['user'], self)
 
     def author(self, author_id):
         """Get info about an author"""
         resp = self.request("author/show", {'id': author_id})
-        return GoodreadsAuthor(resp['author'], self)
+        return gr.Author(resp['author'], self)
 
     def find_author(self, author_name):
         """Find an author by name"""
@@ -85,10 +82,10 @@ class GoodreadsClient():
         """Get info about a book"""
         if book_id:
             resp = self.request("book/show", {'id': book_id})
-            return GoodreadsBook(resp['book'], self)
+            return gr.Book(resp['book'], self)
         elif isbn:
             resp = self.request("book/isbn", {'isbn': isbn})
-            return GoodreadsBook(resp['book'], self)
+            return gr.Book(resp['book'], self)
         else:
             raise GoodreadsClientException("book id or isbn required")
 
@@ -112,12 +109,12 @@ class GoodreadsClient():
     def group(self, group_id):
         """Get info about a group"""
         resp = self.request("group/show", {'id': group_id})
-        return GoodreadsGroup(resp['group'])
+        return gr.Group(resp['group'])
 
     def owned_book(self, owned_book_id):
         """Get info about an owned book, given its id"""
         resp = self.session.get("owned_books/show/%s.xml" % owned_book_id, {})
-        return GoodreadsOwnedBook(resp['owned_book']['owned_book'])
+        return gr.OwnedBook(resp['owned_book']['owned_book'])
 
     def find_groups(self, query, page=1):
         """Find a group based on the query"""
@@ -146,20 +143,20 @@ class GoodreadsClient():
         """
         resp = self.request("%s/%s/comments" % (comment_type, resource_id),
                             {'format': 'xml'})
-        return [GoodreadsComment(comment_dict)
+        return [gr.Comment(comment_dict)
                 for comment_dict in resp['comments']['comment']]
 
     def list_events(self, postal_code):
         """Show events near a location specified with the postal code"""
         resp = self.request("event/index.xml", {'search[postal_code]': postal_code})
-        return [GoodreadsEvent(e) for e in resp['events']['event']]
+        return [gr.Event(e) for e in resp['events']['event']]
 
     def recent_reviews(self):
         """Get the recent reviews from all members"""
         resp = self.request("/review/recent_reviews.xml", {})
-        return [GoodreadsReview(r) for r in resp['reviews']['review']]
+        return [gr.Review(r) for r in resp['reviews']['review']]
 
     def review(self, review_id):
         """Get a review"""
         resp = self.request("/review/show.xml", {'id': review_id})
-        return GoodreadsReview(resp['review'])
+        return gr.Review(resp['review'])

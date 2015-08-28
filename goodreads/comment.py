@@ -1,6 +1,6 @@
 """Class for Goodreads comments"""
 
-import user
+import goodreads.user as user
 
 class GoodreadsComment:
     """Goodreads comment class"""

@@ -1,6 +1,7 @@
 """Goodreads book class"""
 
-import author
+import goodreads as gr
+
 
 class GoodreadsBook:
     def __init__(self, book_dict, client):
@@ -26,11 +27,10 @@ class GoodreadsBook:
         # Goodreads API returns a list if there are more than one authors,
         # otherwise, just the OrderedDict
         if type(self._book_dict['authors']['author']) == list:
-            return [author.GoodreadsAuthor(author_dict, self._client)
+            return [gr.Author(author_dict, self._client)
                     for author_dict in self._book_dict['authors']['author']]
         else:
-            return [author.GoodreadsAuthor(self._book_dict['authors']['author'],
-                                           self._client)]
+            return [gr.Author(self._book_dict['authors']['author'], self._client)]
 
     @property
     def description(self):

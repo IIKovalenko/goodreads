@@ -1,6 +1,5 @@
-import user
-import book
-import comment
+import goodreads as gr
+
 
 class GoodreadsUserStatus:
     def __init__(self, user_status_dict):
@@ -39,17 +38,17 @@ class GoodreadsUserStatus:
     @property
     def user(self):
         """User object for the status"""
-        return user.GoodreadsUser(self._user_status_dict['user'])
+        return gr.User(self._user_status_dict['user'])
 
     @property
     def book(self):
         """Book object for the status"""
-        return book.GoodreadsBook(self._user_status_dict['book'])
+        return gr.Book(self._user_status_dict['book'])
 
     @property
     def comments(self):
         """Comments for the status"""
-        return [comment.GoodreadsComment(comment_dict)
+        return [gr.Comment(comment_dict)
                 for comment_dict in self._user_status_dict['comments']]
 
     @property

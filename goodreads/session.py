@@ -1,6 +1,7 @@
 from rauth.service import OAuth1Service, OAuth1Session
 import xmltodict
 
+
 class GoodreadsSession():
     """Handle OAuth sessions"""
     def __init__(self, client_key, client_secret, access_token=None,
@@ -31,7 +32,7 @@ class GoodreadsSession():
 
     def oauth_finalize(self):
         """Once the user authorizes access, save access tokens"""
-        print self.request_token, self.request_token_secret
+        print(self.request_token, self.request_token_secret)
         self.session = self.service.get_auth_session(self.request_token,
                                                      self.request_token_secret)
         self.access_token = self.session.access_token

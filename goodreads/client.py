@@ -70,7 +70,12 @@ class GoodreadsClient():
             params["page"] = page
             content = self.request(path, params, oauth=oauth, req_format=req_format)
             item_list = content[list_key]
-            result.extend(item_list[item_key])
+            if item_list['@total'] == '0':
+                break
+            if item_list["@start"] == item_list["@end"]:
+                result.append(item_list[item_key])
+            else:
+                result.extend(item_list[item_key])
             if item_list["@end"] >= item_list["@total"]:
                 break
             page += 1
@@ -174,9 +179,9 @@ class GoodreadsClient():
     def recent_reviews(self):
         """Get the recent reviews from all members"""
         resp = self.request("/review/recent_reviews.xml", {})
-        return [gr.Review(r) for r in resp['reviews']['review']]
+        return [gr.Review(r, self) for r in resp['reviews']['review']]
 
     def review(self, review_id):
         """Get a review"""
         resp = self.request("/review/show.xml", {'id': review_id})
-        return gr.Review(resp['review'])
+        return gr.Review(resp['review'], self)

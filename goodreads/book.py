@@ -7,6 +7,7 @@ class GoodreadsBook:
     def __init__(self, book_dict, client):
         self._book_dict = book_dict
         self._client = client
+        self._authors = None
 
     def __repr__(self):
         return self.title
@@ -24,13 +25,15 @@ class GoodreadsBook:
     @property
     def authors(self):
         """Authors of the book"""
-        # Goodreads API returns a list if there are more than one authors,
-        # otherwise, just the OrderedDict
-        if type(self._book_dict['authors']['author']) == list:
-            return [gr.Author(author_dict, self._client)
-                    for author_dict in self._book_dict['authors']['author']]
-        else:
-            return [gr.Author(self._book_dict['authors']['author'], self._client)]
+        if self._authors is None:
+            # Goodreads API returns a list if there are more than one authors,
+            # otherwise, just the OrderedDict
+            if type(self._book_dict['authors']['author']) == list:
+                self._authors = [gr.Author(author_dict, self._client)
+                                 for author_dict in self._book_dict['authors']['author']]
+            else:
+                self._authors = [gr.Author(self._book_dict['authors']['author'], self._client)]
+        return self._authors
 
     @property
     def description(self):

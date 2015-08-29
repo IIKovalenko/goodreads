@@ -43,7 +43,7 @@ class GoodreadsUser():
         """List groups for the user. If there are more than 30 groups, get them
         page by page."""
         resp = self._client.request("group/list/%s.xml" % self.gid, {'page':page})
-        if resp['groups']['list']['@total'] == 0:
+        if resp['groups']['list']['@total'] == '0':
             return {}  # TODO: should actually be OrderedDict, important ?
         return resp['groups']['list']['group']
 
@@ -63,12 +63,11 @@ class GoodreadsUser():
         """Get all books and reviews on user's shelves"""
         resp = self._client.request("/review/list.xml",
                                     {'v': 2, 'id': self.gid, 'page': page}, oauth=True)
-        return [gr.Review(r) for r in resp['reviews']['review']]
+        return [gr.Review(r, self._client) for r in resp['reviews']['review']]
 
-    def shelves(self, page=1):
-        """Get the user's shelves. This method gets shelves only for users with
-        public profile"""
-        resp = self._client.request("shelf/list.xml",
-                                    {'user_id': self.gid, 'page': page})
-        return resp['shelves']['user_shelf']
+    def shelves(self):
+        """Get the user's shelves."""
+        resp = self._client.request_all_pages("shelf/list.xml", {'user_id': self.gid},
+                                              list_key='shelves', item_key='user_shelf', oauth=True)
+        return [gr.Shelf(d, self, self._client) for d in resp]
 

@@ -8,3 +8,4 @@ from .owned_book import GoodreadsOwnedBook as OwnedBook
 from .review import GoodreadsReview as Review
 from .user import GoodreadsUser as User
 from .user_status import GoodreadsUserStatus as UserStatus
+from .shelf import GoodreadsShelf as Shelf

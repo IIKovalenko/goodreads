@@ -33,6 +33,11 @@ class GoodreadsAuthor:
         return self._get_attr('name')
 
     @property
+    def role(self):
+        """Author role"""
+        return self._get_attr('role')
+
+    @property
     def about(self):
         """About the author"""
         return self._get_attr('about')

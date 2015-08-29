@@ -2,7 +2,7 @@ from rauth.service import OAuth1Service, OAuth1Session
 import xmltodict
 
 
-class GoodreadsSession():
+class GoodreadsSession(object):
     """Handle OAuth sessions"""
     def __init__(self, client_key, client_secret, access_token=None,
                  access_token_secret=None):

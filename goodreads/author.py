@@ -1,7 +1,7 @@
 import goodreads as gr
 
 
-class GoodreadsAuthor:
+class GoodreadsAuthor(object):
     def __init__(self, author_dict, client, reload=False):
         self._author_dict = author_dict
         self._client = client

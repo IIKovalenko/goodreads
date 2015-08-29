@@ -2,7 +2,8 @@
 
 import goodreads.user as user
 
-class GoodreadsComment:
+
+class GoodreadsComment(object):
     """Goodreads comment class"""
     def __init__(self, comment_dict):
         self._comment_dict = comment_dict

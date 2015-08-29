@@ -1,6 +1,7 @@
 """Class for GoodreadsEvent"""
 
-class GoodreadsEvent:
+
+class GoodreadsEvent(object):
     def __init__(self, event_dict):
         self._event_dict = event_dict
 

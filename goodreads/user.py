@@ -1,7 +1,7 @@
 import goodreads as gr
 
 
-class GoodreadsUser():
+class GoodreadsUser(object):
     def __init__(self, user_dict, client):
         self._user_dict = user_dict
         self._client = client   # for later queries

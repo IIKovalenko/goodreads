@@ -12,7 +12,7 @@ class GoodreadsRequestException(Exception):
         return "{}: {}".format(self.url, self.error_msg)
 
 
-class GoodreadsRequest():
+class GoodreadsRequest(object):
     def __init__(self, client, path, query_dict, oauth=False, req_format='xml', method='GET'):
         """Initialize request object."""
         self.client = client

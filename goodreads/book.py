@@ -3,7 +3,7 @@
 import goodreads as gr
 
 
-class GoodreadsBook:
+class GoodreadsBook(object):
     def __init__(self, book_dict, client):
         self._book_dict = book_dict
         self._client = client

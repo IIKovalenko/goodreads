@@ -1,4 +1,5 @@
 import webbrowser
+import time
 from builtins import input
 from .session import GoodreadsSession
 from .request import GoodreadsRequest
@@ -22,6 +23,7 @@ class GoodreadsClient():
         """Initialize the client"""
         self.client_key = client_key
         self.client_secret = client_secret
+        self.lastrequest = 0
 
     @property
     def query_dict(self):
@@ -44,18 +46,36 @@ class GoodreadsClient():
         """Return user who authorized OAuth"""
         if not hasattr(self, 'session'):
             raise GoodreadsClientException("No authenticated session")
-        resp = self.session.get("api/auth_user", {})
+        resp = self.request("api/auth_user", {}, oauth=True)
         user_id = resp['user']['@id']
         return self.user(user_id)
 
-    def request(self, *args, **kwargs):
+    def request(self, path, params, oauth=False, req_format='xml'):
         """Create a GoodreadsRequest object and make that request"""
-        req = GoodreadsRequest(self, *args, **kwargs)
+        # Goodreads api guidelines limit requests to once a second
+        while time.clock() - self.lastrequest < 1:
+            time.sleep(0.1)
+        req = GoodreadsRequest(self, path=path, query_dict=params, oauth=oauth, req_format=req_format)
         return req.request()
 
-    def request_oauth(self, *args, **kwargs):
-        resp = self.session.get(*args, **kwargs)
-        return resp
+    def request_all_pages(self, path, params, list_key, item_key, oauth=False, req_format='xml'):
+        """Request all pages from a paginated api endpoint
+
+        The additional parameters list_key and item_key specify the location of the list
+        of entries in the response, i.e. request(...)[list_key][item_key]."""
+
+        result = []
+        page = 1
+        while True:
+            params["page"] = page
+            content = self.request(path, params, oauth=oauth, req_format=req_format)
+            item_list = content[list_key]
+            result.extend(item_list[item_key])
+            if item_list["@end"] >= item_list["@total"]:
+                break
+            page += 1
+
+        return result
 
     def user(self, user_id=None, username=None):
         """Get info about a member by id or username.
@@ -113,7 +133,7 @@ class GoodreadsClient():
 
     def owned_book(self, owned_book_id):
         """Get info about an owned book, given its id"""
-        resp = self.session.get("owned_books/show/%s.xml" % owned_book_id, {})
+        resp = self.request("owned_books/show/%s.xml" % owned_book_id, {}, oauth=True)
         return gr.OwnedBook(resp['owned_book']['owned_book'])
 
     def find_groups(self, query, page=1):

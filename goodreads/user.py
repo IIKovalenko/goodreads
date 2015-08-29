@@ -49,8 +49,8 @@ class GoodreadsUser():
 
     def owned_books(self, page=1):
         """Return the list of books owned by the user"""
-        resp = self._client.session.get("owned_books/user/%s.xml" % self.gid,
-                                        {'page': page, 'format': 'xml'})
+        resp = self._client.request("owned_books/user/%s.xml" % self.gid,
+                                    {'page': page, 'format': 'xml'}, oauth=True)
         return [gr.OwnedBook(d)
                 for d in resp['owned_books']['owned_book']]
 
@@ -61,9 +61,9 @@ class GoodreadsUser():
 
     def reviews(self, page=1):
         """Get all books and reviews on user's shelves"""
-        resp = self._client.session.get("/review/list.xml",
-                                        {'v': 2, 'id': self.gid, 'page': page})
-        return [review.GoodreadsReview(r) for r in resp['reviews']['review']]
+        resp = self._client.request("/review/list.xml",
+                                    {'v': 2, 'id': self.gid, 'page': page}, oauth=True)
+        return [gr.Review(r) for r in resp['reviews']['review']]
 
     def shelves(self, page=1):
         """Get the user's shelves. This method gets shelves only for users with

@@ -63,14 +63,20 @@ class GoodreadsClient():
         """Request all pages from a paginated api endpoint
 
         The additional parameters list_key and item_key specify the location of the list
-        of entries in the response, i.e. request(...)[list_key][item_key]."""
+        of entries in the response, i.e. request(...)[list_key][item_key].
+        If list key is a list/tuple it specifies multiple levels, i.e. the list of entries is at
+        request(...)[list_key[0]][list_key[1]]...[item_key]"""
 
         result = []
         page = 1
         while True:
             params["page"] = page
-            content = self.request(path, params, oauth=oauth, req_format=req_format)
-            item_list = content[list_key]
+            item_list = self.request(path, params, oauth=oauth, req_format=req_format)
+            if not (isinstance(list_key, list) or isinstance(list_key, tuple)):
+                list_key = [list_key]
+            for key in list_key:
+                item_list = item_list[key]
+
             if item_list['@total'] == '0':
                 break
             if item_list["@start"] == item_list["@end"]:

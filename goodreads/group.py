@@ -1,5 +1,6 @@
 """Class for GoodreadsGroup"""
 
+
 class GoodreadsGroup:
     """Goodreads Group class implementation"""
     def __init__(self, group_dict):

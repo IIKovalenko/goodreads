@@ -5,6 +5,9 @@ class GoodreadsUser():
     def __init__(self, user_dict, client):
         self._user_dict = user_dict
         self._client = client   # for later queries
+        self._shelves = None
+        self._owned_books = None
+        self._groups = None
 
     def __repr__(self):
         return self.user_name  # TODO: Decode! probably at request level (?)
@@ -39,35 +42,34 @@ class GoodreadsUser():
         """URL of user image (small)"""
         return self._user_dict['small_image_url']
 
-    def list_groups(self, page=1):
-        """List groups for the user. If there are more than 30 groups, get them
-        page by page."""
-        resp = self._client.request("group/list/%s.xml" % self.gid, {'page':page})
-        if resp['groups']['list']['@total'] == '0':
-            return {}  # TODO: should actually be OrderedDict, important ?
-        return resp['groups']['list']['group']
+    @property
+    def groups(self):
+        """List groups for the user."""
+        if self._groups is None:
+            resp = self._client.request_all_pages("group/list/%s.xml" % self.gid, {},
+                                                  list_key=('groups', 'list'), item_key='group')
+            self._groups = [gr.Group(g) for g in resp]
+        return self._groups
 
-    def owned_books(self, page=1):
+    @property
+    def owned_books(self):
         """Return the list of books owned by the user"""
-        resp = self._client.request("owned_books/user/%s.xml" % self.gid,
-                                    {'page': page, 'format': 'xml'}, oauth=True)
-        return [gr.OwnedBook(d)
-                for d in resp['owned_books']['owned_book']]
+        if self.owned_books is None:
+            resp = self._client.request_all_pages("owned_books/user/%s.xml" % self.gid, {'format': 'xml'},
+                                                  oauth=True, list_key='owned_books', item_key='owned_book')
+            self._owned_books = [gr.OwnedBook(d) for d in resp]
+        return self._owned_books
 
-    def read_status(self):
-        """Get the user's read status"""
-        resp = self._client.request("read_statuses/%s" % self.gid, {})
-        return resp['read_status']
+    @property
+    def reviews(self):
+        """Get all reviews on user's shelves"""
+        return sum((s.reviews for s in self.shelves), [])
 
-    def reviews(self, page=1):
-        """Get all books and reviews on user's shelves"""
-        resp = self._client.request("/review/list.xml",
-                                    {'v': 2, 'id': self.gid, 'page': page}, oauth=True)
-        return [gr.Review(r, self._client) for r in resp['reviews']['review']]
-
+    @property
     def shelves(self):
         """Get the user's shelves."""
-        resp = self._client.request_all_pages("shelf/list.xml", {'user_id': self.gid},
-                                              list_key='shelves', item_key='user_shelf', oauth=True)
-        return [gr.Shelf(d, self, self._client) for d in resp]
-
+        if self._shelves is None:
+            resp = self._client.request_all_pages("shelf/list.xml", {'user_id': self.gid},
+                                                  list_key='shelves', item_key='user_shelf', oauth=True)
+            self._shelves = [gr.Shelf(d, self, self._client) for d in resp]
+        return self._shelves

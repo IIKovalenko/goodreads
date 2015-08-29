@@ -2,6 +2,7 @@
 
 import goodreads as gr
 
+
 class GoodreadsReview():
     def __init__(self, review_dict, client):
         self._review_dict = review_dict

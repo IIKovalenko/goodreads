@@ -47,11 +47,11 @@ class GoodreadsSession():
             access_token=self.access_token,
             access_token_secret=self.access_token_secret)
 
-    def get(self, path, params=None):
-        """OAuth get request"""
+    def request(self, path, params=None, method='GET'):
+        """OAuth request"""
         if self.session is None:
             raise ConnectionError("Oauth Session not yet established, "
                                   "use GoodreadsClient.authenticate() before querying.")
         if params is None:
             params = {}
-        return self.session.get(path, params=params)
+        return self.session.request(url=path, params=params, method=method)

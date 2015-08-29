@@ -50,12 +50,13 @@ class GoodreadsClient():
         user_id = resp['user']['@id']
         return self.user(user_id)
 
-    def request(self, path, params, oauth=False, req_format='xml'):
+    def request(self, path, params, oauth=False, req_format='xml', method='GET'):
         """Create a GoodreadsRequest object and make that request"""
         # Goodreads api guidelines limit requests to once a second
         while time.clock() - self.lastrequest < 1:
             time.sleep(0.1)
-        req = GoodreadsRequest(self, path=path, query_dict=params, oauth=oauth, req_format=req_format)
+        req = GoodreadsRequest(self, path=path, query_dict=params, oauth=oauth,
+                               req_format=req_format, method=method)
         return req.request()
 
     def request_all_pages(self, path, params, list_key, item_key, oauth=False, req_format='xml'):

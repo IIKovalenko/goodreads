@@ -13,7 +13,7 @@ class GoodreadsRequestException(Exception):
 
 
 class GoodreadsRequest():
-    def __init__(self, client, path, query_dict, oauth=False, req_format='xml'):
+    def __init__(self, client, path, query_dict, oauth=False, req_format='xml', method='GET'):
         """Initialize request object."""
         self.client = client
         self.params = query_dict.copy()
@@ -22,10 +22,11 @@ class GoodreadsRequest():
         self.path = path
         self.oauth = oauth
         self.req_format = req_format
+        self.method = method
 
     def request(self):
         if self.oauth:
-            resp = self.client.session.get(self.host+self.path, params=self.params)
+            resp = self.client.session.request(self.host+self.path, params=self.params)
         else:
             resp = requests.get(self.host+self.path, params=self.params)
         if resp.status_code != 200:

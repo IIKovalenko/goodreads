@@ -15,7 +15,7 @@ class GoodreadsBook(object):
     @property
     def gid(self):
         """Goodreads id of the book"""
-        return self._book_dict['id']
+        return self._book_dict['id']['#text']
 
     @property
     def title(self):

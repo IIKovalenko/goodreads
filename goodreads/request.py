@@ -26,14 +26,17 @@ class GoodreadsRequest(object):
 
     def request(self):
         if self.oauth:
-            resp = self.client.session.request(self.host+self.path, params=self.params)
+            resp = self.client.session.request(self.host+self.path, params=self.params, method=self.method)
         else:
             resp = requests.get(self.host+self.path, params=self.params)
-        if resp.status_code != 200:
+        if not 200 <= resp.status_code <= 299:
             raise GoodreadsRequestException(resp.reason, self.path)
         if self.req_format == 'xml':
             data_dict = xmltodict.parse(resp.text)
-            return data_dict['GoodreadsResponse']
+            if 'GoodreadsResponse' in data_dict:  # for GET requests
+                return data_dict['GoodreadsResponse']
+            else:  # for other requests
+                return data_dict
         elif self.req_format == 'json':
             return json.loads(resp.text)
         else:

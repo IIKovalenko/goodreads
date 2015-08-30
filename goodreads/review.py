@@ -12,6 +12,10 @@ class GoodreadsReview(object):
     def __repr__(self):
         return "review [%s]" % self.gid
 
+    def _edit_review(self,):
+        # gc.request('review.xml',params={'book_id':'12796771','review[rating]': '4', 'shelf': 'read', 'review[read_at]':'2013-01-01'}, oauth=True, method='POST')
+        pass
+
     @property
     def gid(self):
         """Goodreads id for the review"""
@@ -32,6 +36,8 @@ class GoodreadsReview(object):
     @property
     def shelves(self):
         """Shelves for the book"""
+        if not isinstance(self._review_dict['shelves']['shelf'], list):
+            return [self._review_dict['shelves']['shelf']['@name']]
         return [shelf['@name']
                 for shelf in self._review_dict['shelves']['shelf']]
 

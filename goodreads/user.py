@@ -10,7 +10,7 @@ class GoodreadsUser(object):
         self._groups = None
 
     def __repr__(self):
-        return self.user_name  # TODO: Decode! probably at request level (?)
+        return self.name
 
     @property
     def gid(self):

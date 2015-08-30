@@ -1,5 +1,4 @@
 from rauth.service import OAuth1Service, OAuth1Session
-import xmltodict
 
 
 class GoodreadsSession(object):
@@ -54,4 +53,7 @@ class GoodreadsSession(object):
                                   "use GoodreadsClient.authenticate() before querying.")
         if params is None:
             params = {}
-        return self.session.request(url=path, params=params, method=method)
+
+        # clear cookies, otherwise some api functions (e.g. edit review) don't work
+        self.session.cookies.clear()
+        return self.session.request(url=path, params=params, method=method, header_auth=True)

@@ -17,7 +17,7 @@ class GoodreadsClientException(Exception):
 
 
 class GoodreadsClient(object):
-    base_url = "http://www.goodreads.com/"
+    base_url = "https://www.goodreads.com/"
 
     def __init__(self, client_key, client_secret):
         """Initialize the client"""

@@ -13,8 +13,17 @@ class GoodreadsReview(object):
         return "review [%s]" % self.gid
 
     def _edit_review(self, params):
-        self._review_dict = self._client.request('review/{}.xml'.format(self.gid),
-                                                 params=params, oauth=True, method='PUT')['review']
+        resp = self._client.request('review/{}.xml'.format(self.gid),
+                                    params=params, oauth=True, method='PUT')
+        # the structure of the returned xml is different
+        resp = resp['review']
+        for k in resp:
+            if resp[k] and '#text' in resp[k]:
+                resp[k] = resp[k]['#text']
+        # for some reason in the  data returned when editing a review
+        # underscores are replaced by dashes in property names
+        resp = {k.replace('-', '_'): v for k, v in resp.items()}
+        self._review_dict.update(resp)
 
     @property
     def gid(self):

@@ -12,9 +12,9 @@ class GoodreadsReview(object):
     def __repr__(self):
         return "review [%s]" % self.gid
 
-    def _edit_review(self,):
-        # gc.request('review.xml',params={'book_id':'12796771','review[rating]': '4', 'shelf': 'read', 'review[read_at]':'2013-01-01'}, oauth=True, method='POST')
-        pass
+    def _edit_review(self, params):
+        self._review_dict = self._client.request('review/{}.xml'.format(self.gid),
+                                                 params=params, oauth=True, method='PUT')['review']
 
     @property
     def gid(self):
@@ -32,6 +32,11 @@ class GoodreadsReview(object):
     def rating(self):
         """Rating of the book"""
         return self._review_dict['rating']
+
+    @rating.setter
+    def rating(self, value):
+        """Edit rating of the book"""
+        self._edit_review({'review[rating]': value})
 
     @property
     def shelves(self):
@@ -61,10 +66,20 @@ class GoodreadsReview(object):
         """Book read at"""
         return self._review_dict['read_at']
 
+    @read_at.setter
+    def read_at(self, value):
+        """Edit book read_at date"""
+        self._edit_review({'review[read_at]': value})
+
     @property
     def body(self):
         """Body for the review"""
         return self._review_dict['body']
+
+    @body.setter
+    def body(self, value):
+        """Edit review body"""
+        self._edit_review({'review[review]': value})
 
     @property
     def comments_count(self):
